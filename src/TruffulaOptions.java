@@ -107,7 +107,7 @@ public class TruffulaOptions  {
     boolean useColorValue = true;
 
     if(args.length < 1 || args.length > 3){
-      throw new IllegalArgumentException("Invalid Arguments");
+      throw new IllegalArgumentException("Arguments cannot be under 0 or more than 3");
     }
 
     if(args.length == 1){
@@ -133,8 +133,8 @@ public class TruffulaOptions  {
           throw new FileNotFoundException("The path points to a file, not a directory: " + path);
         }
 
-        if(args[0] != "-h" && args[0] != "-nc"){
-           throw new IllegalArgumentException("Invalid Arguments.");
+        if(!args[0].equals("-h") && !args[0].equals("-nc")){
+           throw new IllegalArgumentException("Arguments need to be either -h or -nc.");
         }
 
         if(args[0] == "-h"){
@@ -157,16 +157,16 @@ public class TruffulaOptions  {
           throw new FileNotFoundException("The path points to a file, not a directory: " + path);
         }
 
-        if(args[0] == "-h" && args[1] == "-nc" ){
+        if(!args[0].equals("-h") && !args[1].equals("-nc")){
            rootValue = file;
            showHiddenValue = true;
            useColorValue = false;
-        }else if(args[1] == "-h" && args[0] == "-nc" ){
+        }else  if(!args[1].equals("-h") && !args[0].equals("-nc")){
            rootValue = file;
            showHiddenValue = true;
            useColorValue = false;
         }else{
-          throw new IllegalArgumentException("Invalid Arguments");
+          throw new IllegalArgumentException("Arguments need to be either -h or -nc.");
         }
     }
 
