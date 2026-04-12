@@ -1,6 +1,7 @@
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Console;
 import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,7 +45,7 @@ class ColorPrinterTest {
 
   @Test
   void testPrintWithGreen(){
-     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     PrintStream printStream = new PrintStream(outputStream);
 
     ColorPrinter printer = new ColorPrinter(printStream);
@@ -58,6 +59,25 @@ class ColorPrinterTest {
     // Assert: Verify the printed output
     assertEquals(expectedOutput, outputStream.toString());
   }
+
+  @Test
+  void testPrintEmptyString(){
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    PrintStream printStream = new PrintStream(outputStream);
+
+    ColorPrinter printer = new ColorPrinter(printStream);
+    printer.setCurrentColor(ConsoleColor.WHITE);
+
+    String message = "";
+    printer.print(message, false);
+
+    String expectedOutput = ConsoleColor.WHITE + "";
+
+    // Assert: Verify the printed output
+    assertEquals(expectedOutput, outputStream.toString());
+  }
+
+  
 }
 
 
