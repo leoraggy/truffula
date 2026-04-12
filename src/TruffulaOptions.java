@@ -101,10 +101,79 @@ public class TruffulaOptions  {
    * @throws FileNotFoundException if the directory cannot be found or if the path points to a file
    */
   public TruffulaOptions(String[] args) throws IllegalArgumentException, FileNotFoundException {
-    // TODO: Replace the below lines with your implementation
-    root = null;
-    showHidden = false;
-    useColor = false;
+
+    File rootValue = null;
+    boolean showHiddenValue = false;
+    boolean useColorValue = true;
+
+    if(args.length < 1 || args.length > 3){
+      throw new IllegalArgumentException("Invalid Arguments");
+    }
+
+    if(args.length == 1){
+        String path = args[0];
+        File file = new File(path);
+
+        if(!file.exists()){
+          throw new FileNotFoundException("Directory could not be found " + path);
+        }else if (file.isFile()){
+          throw new FileNotFoundException("The path points to a file, not a directory: " + path);
+        }
+
+        rootValue = file;
+        showHiddenValue = false;
+        useColorValue = true;
+    }else if (args.length == 2){
+        String path = args[1];
+        File file = new File(path);
+
+        if(!file.exists()){
+          throw new FileNotFoundException("Directory could not be found " + path);
+        }else if (file.isFile()){
+          throw new FileNotFoundException("The path points to a file, not a directory: " + path);
+        }
+
+        if(args[0] != "-h" && args[0] != "-nc"){
+           throw new IllegalArgumentException("Invalid Arguments.");
+        }
+
+        if(args[0] == "-h"){
+           rootValue = file;
+           showHiddenValue = true;
+          useColorValue = true;
+        }else if (args[0] == "-nc"){
+            rootValue = file;
+            showHiddenValue = false;
+            useColorValue = false;
+        }
+
+    }else if (args.length == 3){
+        String path = args[2];
+        File file = new File(path);
+
+        if(!file.exists()){
+          throw new FileNotFoundException("Directory could not be found " + path);
+        }else if (file.isFile()){
+          throw new FileNotFoundException("The path points to a file, not a directory: " + path);
+        }
+
+        if(args[0] == "-h" && args[1] == "-nc" ){
+           rootValue = file;
+           showHiddenValue = true;
+           useColorValue = false;
+        }else if(args[1] == "-h" && args[0] == "-nc" ){
+           rootValue = file;
+           showHiddenValue = true;
+           useColorValue = false;
+        }else{
+          throw new IllegalArgumentException("Invalid Arguments");
+        }
+    }
+
+    root = rootValue;
+    showHidden = showHiddenValue;
+    useColor = useColorValue;
+      
   }
 
   /**
@@ -119,4 +188,5 @@ public class TruffulaOptions  {
     this.showHidden = showHidden;
     this.useColor = useColor;
   }
+
 }
