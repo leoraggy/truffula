@@ -109,11 +109,12 @@ public class TruffulaPrinter {
     // - For Wave 6: Use AlphabeticalFileSorter
     // DO NOT USE SYSTEM.OUT.PRINTLN
     // USE out.println instead (will use your ColorPrinter)
+    boolean isHidden = options.isShowHidden();
 
-    printTreeHelper(options.getRoot(), "");
+    printTreeHelper(options.getRoot(), "", isHidden);
   }
 
-  private void printTreeHelper(File files, String indent){
+  private void printTreeHelper(File files, String indent, boolean isHidden){
     if(files == null) return;
 
     File[] filesList = files.listFiles();
@@ -121,10 +122,12 @@ public class TruffulaPrinter {
     if(filesList != null){
       out.println(indent + files.getName() + "/");
       for(File file : files.listFiles()){
-      printTreeHelper(file, indent + "   ");
+      printTreeHelper(file, indent + "   ", isHidden);
     }
     }else{
-      if(!files.isHidden()){
+      if(!files.isHidden() && isHidden){
+        out.println(indent + files.getName());
+      }else{
         out.println(indent + files.getName());
       }
     }
