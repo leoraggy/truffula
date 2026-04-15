@@ -1,3 +1,4 @@
+import java.io.Console;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.List;
@@ -114,24 +115,32 @@ public class TruffulaPrinter {
     printTreeHelper(options.getRoot(), "", isHidden);
   }
 
-  private void printTreeHelper(File files, String indent, boolean isHidden){
-    if(files == null) return;
-
-    File[] filesList = files.listFiles();
-
-    if(filesList != null){
-      out.println(indent + files.getName() + "/");
-      for(File file : files.listFiles()){
-      printTreeHelper(file, indent + "   ", isHidden);
+  private void printTreeHelper(File file, String indent, boolean showHidden) {
+    if (file == null || (file.isHidden() && !showHidden)) {
+        return;
     }
-    }else{
-      if(!files.isHidden() && isHidden){
-        out.println(indent + files.getName());
-      }else{
-        out.println(indent + files.getName());
-      }
+
+    out.setCurrentColor(cycleColor(indent.length()));
+
+    if (file.isDirectory()) {
+        out.println(indent + file.getName() + "/");
+        
+        File[] filesList = file.listFiles(); 
+        if (filesList != null) {
+            AlphabeticalFileSorter.sort(filesList); 
+            
+            for (File child : filesList) { 
+                printTreeHelper(child, indent + "   ", showHidden);
+            }
+        }
+    } 
+    else {
+        out.println(indent + file.getName());
     }
-    
-    
+}
+
+  private ConsoleColor cycleColor(int count){
+    int colorIndex = (count / 3) % colorSequence.size();
+    return colorSequence.get(colorIndex);
   }
 }

@@ -60,8 +60,8 @@ public class TruffulaPrinterTest {
         return hidden;
     }
 
-      @Test
-    public void testPrintTree_ExactOutput_BareBones(@TempDir File tempDir) throws IOException {
+    @Test
+    public void testPrintTree_ExactOutput_WithCustomPrintStream(@TempDir File tempDir) throws IOException {
         // Build the example directory structure:
         // myFolder/
         //    .hidden.txt
@@ -88,6 +88,9 @@ public class TruffulaPrinterTest {
         banana.createNewFile();
         zebra.createNewFile();
 
+        // Create a hidden file in myFolder
+        createHiddenFile(myFolder, ".hidden.txt");
+
         // Create subdirectory "Documents" in myFolder
         File documents = new File(myFolder, "Documents");
         assertTrue(documents.mkdir(), "Documents directory should be created");
@@ -108,8 +111,8 @@ public class TruffulaPrinterTest {
         cat.createNewFile();
         dog.createNewFile();
 
-        // Set up TruffulaOptions with showHidden = false and useColor = false
-        TruffulaOptions options = new TruffulaOptions(myFolder, false, false);
+        // Set up TruffulaOptions with showHidden = false and useColor = true
+        TruffulaOptions options = new TruffulaOptions(myFolder, false, true);
 
         // Capture output using a custom PrintStream
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -123,27 +126,31 @@ public class TruffulaPrinterTest {
 
         // Retrieve printed output
         String output = baos.toString();
-
-        // removes the color for now because wave 4 doesnt have usecolor false implemented. remove after implementation
-        output = output.replaceAll("\\u001B\\[[;\\d]*m", "");
-
         String nl = System.lineSeparator();
 
+        // Build expected output with exact colors and indentation
+        ConsoleColor reset = ConsoleColor.RESET;
+        ConsoleColor white = ConsoleColor.WHITE;
+        ConsoleColor purple = ConsoleColor.PURPLE;
+        ConsoleColor yellow = ConsoleColor.YELLOW;
+
         StringBuilder expected = new StringBuilder();
-        expected.append("myFolder/").append(nl);
-        expected.append("   Apple.txt").append(nl);
-        expected.append("   banana.txt").append(nl);
-        expected.append("   Documents/").append(nl);
-        expected.append("      images/").append(nl);
-        expected.append("         cat.png").append(nl);
-        expected.append("         Dog.png").append(nl);
-        expected.append("      notes.txt").append(nl);
-        expected.append("      README.md").append(nl);
-        expected.append("   zebra.txt").append(nl);
+        expected.append(white).append("myFolder/").append(nl).append(reset);
+        expected.append(purple).append("   Apple.txt").append(nl).append(reset);
+        expected.append(purple).append("   banana.txt").append(nl).append(reset);
+        expected.append(purple).append("   Documents/").append(nl).append(reset);
+        expected.append(yellow).append("      images/").append(nl).append(reset);
+        expected.append(white).append("         cat.png").append(nl).append(reset);
+        expected.append(white).append("         Dog.png").append(nl).append(reset);
+        expected.append(yellow).append("      notes.txt").append(nl).append(reset);
+        expected.append(yellow).append("      README.md").append(nl).append(reset);
+        expected.append(purple).append("   zebra.txt").append(nl).append(reset);
+
         // Assert that the output matches the expected output exactly
         assertEquals(expected.toString(), output);
     }
 
+    
     @Test
 public void testPrintTree_ShowHiddenFiles(@TempDir File tempDir) throws IOException {
     File myFolder = new File(tempDir, "hiddenTest");
@@ -193,4 +200,30 @@ public void testPrintTree_EmptySubdirectory(@TempDir File tempDir) throws IOExce
 
     assertEquals(expected, output, "Empty subdirectories should be printed with a trailing slash.");
 }
+
+ @Test
+    public void testColor(@TempDir File tempDir) throws IOException {
+        File root = new File("colorRoot");
+        root.mkdir();
+
+        File child = new File(root, "file.txt");
+        child.createNewFile();
+
+        TruffulaOptions options = new TruffulaOptions(root, true, true);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos);
+
+        TruffulaPrinter printer = new TruffulaPrinter(options, printStream);
+
+        printer.printTree();
+
+        String output = baos.toString();
+
+        assertTrue(output.contains("\u001B"));
+        assertTrue(output.contains("colorRoot/"));
+        assertTrue(output.contains("file.txt"));
+        assertTrue(output.contains(ConsoleColor.RESET.toString()));
+    }
 }
+
