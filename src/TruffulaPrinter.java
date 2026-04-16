@@ -111,16 +111,20 @@ public class TruffulaPrinter {
     // DO NOT USE SYSTEM.OUT.PRINTLN
     // USE out.println instead (will use your ColorPrinter)
     boolean isHidden = options.isShowHidden();
+    boolean showColor = options.isUseColor();
 
-    printTreeHelper(options.getRoot(), "", isHidden);
+    printTreeHelper(options.getRoot(), "", isHidden, showColor);
   }
 
-  private void printTreeHelper(File file, String indent, boolean showHidden) {
+  private void printTreeHelper(File file, String indent, boolean showHidden, boolean showColor) {
     if (file == null || (file.isHidden() && !showHidden)) {
         return;
     }
 
-    out.setCurrentColor(cycleColor(indent.length()));
+    if(showColor){
+      out.setCurrentColor(cycleColor(indent.length()));
+    }
+
 
     if (file.isDirectory()) {
         out.println(indent + file.getName() + "/");
@@ -130,7 +134,7 @@ public class TruffulaPrinter {
             AlphabeticalFileSorter.sort(filesList); 
             
             for (File child : filesList) { 
-                printTreeHelper(child, indent + "   ", showHidden);
+                printTreeHelper(child, indent + "   ", showHidden, showColor);
             }
         }
     } 
